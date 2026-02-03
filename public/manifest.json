@@ -1,0 +1,15 @@
+{
+  "short_name": "Attendex",
+  "name": "Amrita Attendex",
+  "icons": [
+    {
+      "src": "/logos/pragati.webp",
+      "type": "image/webp",
+      "sizes": "256x256"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
