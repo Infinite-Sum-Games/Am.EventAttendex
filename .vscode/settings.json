@@ -7,5 +7,8 @@
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
-  }
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.chat.experimental.codeGenerationInstructions": "Follow all guidelines in AGENTS.md. This is a mobile-first React + TypeScript app. Use TanStack Query for all API calls, Zod for validation, and organize components in src/components/[page-name]/ folders. Mobile responsiveness is the highest priority.",
+  "github.copilot.editor.enableInlineSuggestions": true
 }

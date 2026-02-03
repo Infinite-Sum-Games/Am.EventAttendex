@@ -1,7 +1,43 @@
+# AI Coding Agents - Universal Instructions
+
+## 🚨 CRITICAL: Read AGENTS.md First
+**ALL AI CODING AGENTS (Cursor, Gemini, Antigravity, Copilot, etc.) must read AGENTS.md before making any changes.** This file contains the complete development standards.
+
+## Project Overview
+- **Mobile-first React + TypeScript web app for phones**
+- Mobile responsiveness is the HIGHEST priority
+- Stack: Bun + React 19 + TanStack Router/Query + Tailwind CSS v4
+
+## Key Rules Summary
+- Design for MOBILE first (44px touch targets, single column layouts)
+- Page components in `src/components/[page-name]/` folders
+- ALL API calls use TanStack Query with loading states
+- All API payloads need Zod schemas in `src/schemas/`
+- Use `zod.safeParse()` for validation
+- Form errors appear directly below fields
+- Centralized endpoints in `src/lib/api-endpoints.ts`
+- Code style: no semicolons, double quotes, 2-space tabs
+
+## Commands
+```bash
+bun install && bun run dev    # Start development
+bun run lint:fix              # Fix code issues
+bun run format                # Format code
+```
+
 # shadcn instructions
 
 Use the latest version of Shadcn to install new components, like this command to add a button component:
 
 ```bash
-pnpm dlx shadcn@latest add button
+bunx shadcn@latest add button
 ```
+
+---
+
+## Agent-Specific Instructions
+- **Gemini**: Also see GEMINI.md
+- **Antigravity**: Also see ANTIGRAVITY.md
+- **GitHub Copilot**: Also see .github/copilot-instructions.md
+
+**Complete guidelines always in AGENTS.md - reference it for everything!**
