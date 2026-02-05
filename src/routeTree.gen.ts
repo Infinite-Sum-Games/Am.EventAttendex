@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as LoginIndexRouteImport } from "./routes/login/index"
+import { Route as AppLoginRouteImport } from "./routes/app/login"
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
@@ -22,30 +23,39 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: "/login/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppLoginRoute = AppLoginRouteImport.update({
+  id: "/app/login",
+  path: "/app/login",
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/app/login": typeof AppLoginRoute
   "/login/": typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/app/login": typeof AppLoginRoute
   "/login": typeof LoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
+  "/app/login": typeof AppLoginRoute
   "/login/": typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/login/"
+  fullPaths: "/" | "/app/login" | "/login/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/login"
-  id: "__root__" | "/" | "/login/"
+  to: "/" | "/app/login" | "/login"
+  id: "__root__" | "/" | "/app/login" | "/login/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppLoginRoute: typeof AppLoginRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
@@ -65,11 +75,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/app/login": {
+      id: "/app/login"
+      path: "/app/login"
+      fullPath: "/app/login"
+      preLoaderRoute: typeof AppLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppLoginRoute: AppLoginRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport

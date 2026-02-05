@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { loginSchema } from "@/schemas/auth"
 import type { LoginSchema } from "@/schemas/auth"
 import { useMutation } from "@tanstack/react-query"
-import { Eye, EyeOff } from "lucide-react"
+import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -32,7 +33,6 @@ export function LoginForm({
     password: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [showPassword, setShowPassword] = useState(false)
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginSchema) => {
@@ -40,8 +40,10 @@ export function LoginForm({
       return response.data
     },
     onSuccess: (data) => {
-      // TODO: Navigate to dashboard or handle success state
-      // window.location.href = "/dashboard"
+      // Handle success (e.g., redirect, toast)
+      console.log("Login success:", data)
+      // For now just logging, navigation would handle redirect
+      alert("Login successful!")
     },
     onError: (error: any) => {
       console.error("Login failed:", error)
@@ -64,7 +66,7 @@ export function LoginForm({
       if (error instanceof z.ZodError) {
         setErrors((prev) => ({
           ...prev,
-          [field]: error.errors?.[0]?.message || "Invalid input",
+          [field]: error.errors[0].message,
         }))
       }
     }
@@ -73,6 +75,9 @@ export function LoginForm({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     setFormData((prev) => ({ ...prev, [id]: value }))
+    // Clear error on change or validate on change?
+    // AGENTS.md says "Show validation errors directly below corresponding fields"
+    // Let's validate on change to give immediate feedback or clear error
     validateField(id as keyof LoginSchema, value)
   }
 
@@ -98,24 +103,23 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="bg-background/60 backdrop-blur-xl border-accent/20 shadow-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>
-            Login with your organizer credentials
-          </CardDescription>
+      <Card>
+        <CardHeader>
+          <CardTitle>Welcome back</CardTitle>
+          <CardDescription>Login to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="username">Email</FieldLabel>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="email@example.com"
+                  placeholder="Enter your username"
                   value={formData.username}
                   onChange={handleChange}
+                  // invalid={!!errors.username} // Input component might not accept invalid prop directly, checking simple input usage
                   className={
                     errors.username
                       ? "border-destructive focus-visible:ring-destructive"
@@ -129,36 +133,18 @@ export function LoginForm({
 
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={
-                      errors.password
-                        ? "border-destructive focus-visible:ring-destructive pr-10"
-                        : "pr-10"
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
-                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={
+                    errors.password
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : ""
+                  }
+                />
                 <FieldError>
                   {errors.password && <p>{errors.password}</p>}
                 </FieldError>
