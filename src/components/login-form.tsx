@@ -6,7 +6,7 @@ import type { LoginSchema } from "@/schemas/auth"
 import { useMutation } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
-import { z } from "zod"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -39,7 +39,7 @@ export function LoginForm({
       const response = await axiosClient.post(apiEndpoints.LOGIN, data)
       return response.data
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       // TODO: Navigate to dashboard or handle success state
       // window.location.href = "/dashboard"
     },
@@ -52,28 +52,9 @@ export function LoginForm({
     },
   })
 
-  const validateField = (field: keyof LoginSchema, value: string) => {
-    try {
-      loginSchema.shape[field].parse(value)
-      setErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors[field]
-        return newErrors
-      })
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: error.errors?.[0]?.message || "Invalid input",
-        }))
-      }
-    }
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     setFormData((prev) => ({ ...prev, [id]: value }))
-    validateField(id as keyof LoginSchema, value)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -84,7 +65,7 @@ export function LoginForm({
 
     if (!result.success) {
       const newErrors: Record<string, string> = {}
-      result.error.errors.forEach((err) => {
+      result.error.issues.forEach((err) => {
         if (err.path[0]) {
           newErrors[err.path[0].toString()] = err.message
         }
