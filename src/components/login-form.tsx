@@ -1,9 +1,8 @@
-import axiosClient from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api-endpoints"
+import { useNavigate } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
-import { loginSchema } from "@/schemas/auth"
-import type { LoginSchema } from "@/schemas/auth"
-import { useMutation } from "@tanstack/react-query"
+// import { loginSchema } from "@/schemas/auth"
+// import type { LoginSchema } from "@/schemas/auth"
+// import { useMutation } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
-  FieldError,
+  // FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -27,13 +26,14 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [formData, setFormData] = useState<LoginSchema>({
-    username: "",
-    password: "",
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const navigate = useNavigate()
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  // const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPassword, setShowPassword] = useState(false)
 
+  // Login mutation commented out for mock implementation
+  /*
   const loginMutation = useMutation({
     mutationFn: async (data: LoginSchema) => {
       const response = await axiosClient.post(apiEndpoints.LOGIN, data)
@@ -51,30 +51,12 @@ export function LoginForm({
       })
     },
   })
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
+  */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({})
-
-    const result = loginSchema.safeParse(formData)
-
-    if (!result.success) {
-      const newErrors: Record<string, string> = {}
-      result.error.issues.forEach((err) => {
-        if (err.path[0]) {
-          newErrors[err.path[0].toString()] = err.message
-        }
-      })
-      setErrors(newErrors)
-      return
-    }
-
-    loginMutation.mutate(result.data)
+    // Bypass validation and API call
+    navigate({ to: "/app/events" })
   }
 
   return (
@@ -95,17 +77,9 @@ export function LoginForm({
                   id="username"
                   type="text"
                   placeholder="email@example.com"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={
-                    errors.username
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : ""
-                  }
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
-                <FieldError>
-                  {errors.username && <p>{errors.username}</p>}
-                </FieldError>
               </Field>
 
               <Field>
@@ -115,13 +89,9 @@ export function LoginForm({
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={
-                      errors.password
-                        ? "border-destructive focus-visible:ring-destructive pr-10"
-                        : "pr-10"
-                    }
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pr-10"
                   />
                   <Button
                     type="button"
@@ -140,24 +110,11 @@ export function LoginForm({
                     )}
                   </Button>
                 </div>
-                <FieldError>
-                  {errors.password && <p>{errors.password}</p>}
-                </FieldError>
               </Field>
 
-              {errors.root && (
-                <div className="text-destructive text-sm font-medium">
-                  {errors.root}
-                </div>
-              )}
-
               <Field>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loginMutation.isPending}
-                >
-                  {loginMutation.isPending ? "Logging in..." : "Login"}
+                <Button type="submit" className="w-full">
+                  Login
                 </Button>
               </Field>
             </FieldGroup>
