@@ -9,11 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
+import { Route as EventsRouteImport } from "./routes/events"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as LoginIndexRouteImport } from "./routes/login/index"
-import { Route as AppLoginRouteImport } from "./routes/app/login"
-import { Route as AppEventsRouteImport } from "./routes/app/events"
 
+const EventsRoute = EventsRouteImport.update({
+  id: "/events",
+  path: "/events",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
@@ -24,53 +28,46 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: "/login/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppLoginRoute = AppLoginRouteImport.update({
-  id: "/app/login",
-  path: "/app/login",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppEventsRoute = AppEventsRouteImport.update({
-  id: "/app/events",
-  path: "/app/events",
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
-  "/app/events": typeof AppEventsRoute
-  "/app/login": typeof AppLoginRoute
+  "/events": typeof EventsRoute
   "/login/": typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
-  "/app/events": typeof AppEventsRoute
-  "/app/login": typeof AppLoginRoute
+  "/events": typeof EventsRoute
   "/login": typeof LoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
-  "/app/events": typeof AppEventsRoute
-  "/app/login": typeof AppLoginRoute
+  "/events": typeof EventsRoute
   "/login/": typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/app/events" | "/app/login" | "/login/"
+  fullPaths: "/" | "/events" | "/login/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/app/events" | "/app/login" | "/login"
-  id: "__root__" | "/" | "/app/events" | "/app/login" | "/login/"
+  to: "/" | "/events" | "/login"
+  id: "__root__" | "/" | "/events" | "/login/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppEventsRoute: typeof AppEventsRoute
-  AppLoginRoute: typeof AppLoginRoute
+  EventsRoute: typeof EventsRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/events": {
+      id: "/events"
+      path: "/events"
+      fullPath: "/events"
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/": {
       id: "/"
       path: "/"
@@ -85,27 +82,12 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/app/login": {
-      id: "/app/login"
-      path: "/app/login"
-      fullPath: "/app/login"
-      preLoaderRoute: typeof AppLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/app/events": {
-      id: "/app/events"
-      path: "/app/events"
-      fullPath: "/app/events"
-      preLoaderRoute: typeof AppEventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppEventsRoute: AppEventsRoute,
-  AppLoginRoute: AppLoginRoute,
+  EventsRoute: EventsRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport

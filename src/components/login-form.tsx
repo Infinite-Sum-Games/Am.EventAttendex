@@ -1,10 +1,10 @@
 import { useNavigate } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
-// import { loginSchema } from "@/schemas/auth"
-// import type { LoginSchema } from "@/schemas/auth"
-// import { useMutation } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
+import axiosClient from "@/lib/axios"
+import { apiEndpoints } from "@/lib/api-endpoints"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,12 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Field,
-  // FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
 export function LoginForm({
@@ -29,34 +24,35 @@ export function LoginForm({
   const navigate = useNavigate()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  // const [errors, setErrors] = useState<Record<string, string>>({})
+  const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
-  // Login mutation commented out for mock implementation
-  /*
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginSchema) => {
+    mutationFn: async (data: { email: string; password: string }) => {
       const response = await axiosClient.post(apiEndpoints.LOGIN, data)
       return response.data
     },
-    onSuccess: (_data) => {
-      // TODO: Navigate to dashboard or handle success state
-      // window.location.href = "/dashboard"
+    onSuccess: () => {
+      navigate({ to: "/events" })
     },
     onError: (error: any) => {
       console.error("Login failed:", error)
-      setErrors({
-        root:
-          error.response?.data?.message || "Login failed. Please try again.",
-      })
+      setError(
+        error.response?.data?.message || "Login failed. Please try again."
+      )
     },
   })
-  */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Bypass validation and API call
-    navigate({ to: "/app/events" })
+    setError("")
+
+    if (!username || !password) {
+      setError("Please enter both email and password")
+      return
+    }
+
+    loginMutation.mutate({ email: username, password })
   }
 
   return (
@@ -112,9 +108,18 @@ export function LoginForm({
                 </div>
               </Field>
 
+              {/* Error message */}
+              {error && (
+                <div className="text-sm text-red-500 text-center">{error}</div>
+              )}
+
               <Field>
-                <Button type="submit" className="w-full">
-                  Login
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loginMutation.isPending}
+                >
+                  {loginMutation.isPending ? "Logging in..." : "Login"}
                 </Button>
               </Field>
             </FieldGroup>

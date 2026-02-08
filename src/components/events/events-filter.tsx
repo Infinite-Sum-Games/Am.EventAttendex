@@ -2,22 +2,16 @@ import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { Search } from "lucide-react"
+import { Search, Users } from "lucide-react"
 import { ORGANIZERS } from "./mock-data"
-
-interface EventsFilterProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
-  selectedOrg: string
-  setSelectedOrg: (org: string) => void
-  selectedDay: "All" | "Day 1" | "Day 2" | "Day 3"
-  setSelectedDay: (day: "All" | "Day 1" | "Day 2" | "Day 3") => void
-}
+import type { EventsFilterProps } from "@/types/events"
 
 export function EventsFilter({
   searchQuery,
@@ -28,74 +22,71 @@ export function EventsFilter({
   setSelectedDay,
 }: EventsFilterProps) {
   return (
-    <div
-      className={cn(
-        // Glass effect container
-        "flex flex-col gap-4 p-4 rounded-2xl",
-        "bg-white/5 backdrop-blur-xl",
-        "border border-white/10",
-        "shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]",
-        "shadow-[0_0_30px_rgba(200,200,200,0.1)]"
-      )}
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(147,51,234,0.05) 0%, rgba(255,255,255,0.02) 50%, rgba(147,51,234,0.03) 100%)",
-      }}
-    >
+    <div className="flex flex-col gap-4">
+      {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-300/60" />
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          size={16}
+        />
         <Input
           id="search"
           placeholder="Search by name, organization..."
+          className="pl-9 border-input text-foreground focus-visible:ring-ring"
+          style={{ backgroundColor: "var(--navy-dark)" }}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className={cn(
-            "w-full pl-10 bg-purple-500/10 border-purple-400/20 text-purple-200",
-            "placeholder:text-purple-200",
-            "focus:border-purple-400/30 focus:ring-purple-400/10"
-          )}
         />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="w-full sm:flex-1">
+          {/* Organizers Dropdown */}
           <Select value={selectedOrg} onValueChange={setSelectedOrg}>
             <SelectTrigger
-              className={cn(
-                "w-full bg-purple-500/10 border-purple-400/20 text-purple-200",
-                "focus:border-purple-400/30 focus:ring-purple-400/10"
-              )}
+              className="w-full pl-9 relative border-input"
+              style={{ backgroundColor: "var(--navy-dark)" }}
             >
-              <SelectValue placeholder="Select Organization" />
+              <Users
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+              <SelectValue placeholder="All organizers" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900/90 backdrop-blur-xl border-purple-400/20">
-              {ORGANIZERS.map((org) => (
-                <SelectItem
-                  key={org}
-                  value={org}
-                  className="text-purple-200/80 focus:bg-purple-500/5 focus:text-purple-100"
-                >
-                  {org}
-                </SelectItem>
-              ))}
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Organizers</SelectLabel>
+                <SelectItem value="All organizers">All organizers</SelectItem>
+                {ORGANIZERS.filter((org) => org !== "All organizers").map(
+                  (org) => (
+                    <SelectItem key={org} value={org}>
+                      {org}
+                    </SelectItem>
+                  )
+                )}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="w-full sm:flex-1 flex gap-2">
-          {(["All", "Day 1", "Day 2", "Day 3"] as const).map((day) => (
+        {/* Toggle container - matches dropdown height */}
+        <div
+          className="w-full sm:flex-1 flex items-center gap-0.5 px-1 rounded-md border border-zinc-700/50 h-9"
+          style={{ backgroundColor: "var(--navy-dark)" }}
+        >
+          {(["All", "20 Feb", "21 Feb"] as const).map((day) => (
             <button
               key={day}
               onClick={() => setSelectedDay(day)}
               className={cn(
-                "flex-1 rounded-lg px-2 py-1 text-xs font-semibold whitespace-nowrap h-8 backdrop-blur-sm",
+                "flex-1 rounded px-2 py-1 text-sm font-medium whitespace-nowrap",
                 "transition-all duration-200",
                 selectedDay === day
-                  ? "bg-purple-500/10 text-purple-200 border border-purple-400/30"
-                  : "bg-purple-500/[0.03] text-purple-300/60 border border-purple-400/10 hover:bg-purple-500/[0.08] hover:text-purple-300/80"
+                  ? "border border-amber-500/80 text-amber-400 bg-transparent"
+                  : "border border-transparent text-zinc-400 hover:text-zinc-200"
               )}
             >
-              {day === "All" ? "All" : day}
+              {day}
             </button>
           ))}
         </div>

@@ -1,52 +1,35 @@
-export interface Event {
-  id: string
-  name: string
-  organizer: string
-  day: "Day 1" | "Day 2" | "Day 3"
-}
+import type { Event } from "@/types/events"
 
 export const MOOCK_EVENTS: Event[] = [
   {
     id: "1",
     name: "Tech Talk 2024",
     organizer: "Computer Science Dept",
-    day: "Day 1",
+    day: "20 Feb",
   },
   {
     id: "2",
     name: "Cultural Fest",
     organizer: "Arts Club",
-    day: "Day 2",
-  },
-  {
-    id: "3",
-    name: "Robotics Workshop",
-    organizer: "Robotics Club",
-    day: "Day 3",
+    day: "21 Feb",
   },
   {
     id: "4",
     name: "Coding Marathon",
     organizer: "Computer Science Dept",
-    day: "Day 1",
+    day: "20 Feb",
   },
   {
     id: "5",
     name: "Music Concert",
     organizer: "Music Club",
-    day: "Day 2",
-  },
-  {
-    id: "6",
-    name: "Gaming Tournament",
-    organizer: "Gaming Club",
-    day: "Day 3",
+    day: "21 Feb",
   },
   {
     id: "7",
     name: "AI Seminar",
     organizer: "AI Research Group",
-    day: "Day 1",
+    day: "20 Feb",
   },
 ]
 

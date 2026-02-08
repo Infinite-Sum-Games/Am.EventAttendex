@@ -6,13 +6,7 @@ import {
   CardDescription,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import type { Event } from "./mock-data"
-
-interface EventCardProps {
-  event: Event
-  className?: string
-  isActive?: boolean
-}
+import type { EventCardProps } from "@/types/events"
 
 export function EventCard({
   event,
@@ -24,7 +18,7 @@ export function EventCard({
       className={cn(
         // Base glass effect
         "w-full overflow-hidden rounded-2xl border border-white/10",
-        "bg-white/5 backdrop-blur-xl",
+        "backdrop-blur-xl",
         // Soft inner highlight
         "shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]",
         // Grey outer glow
@@ -38,9 +32,7 @@ export function EventCard({
         className
       )}
       style={{
-        background: isActive
-          ? "linear-gradient(135deg, rgba(234,179,8,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(234,179,8,0.05) 100%)"
-          : "linear-gradient(135deg, rgba(147,51,234,0.1) 0%, rgba(255,255,255,0.03) 50%, rgba(147,51,234,0.05) 100%)",
+        backgroundColor: "var(--navy-card)",
       }}
     >
       <CardHeader className="pb-1">
@@ -55,7 +47,7 @@ export function EventCard({
         <div
           className={cn(
             "inline-block rounded-lg px-3 py-1 text-sm font-semibold",
-            "bg-purple-500/10 text-purple-300/80 border border-purple-400/10"
+            "bg-amber-500/10 text-amber-300/80 border border-amber-400/10"
           )}
         >
           {event.day}
