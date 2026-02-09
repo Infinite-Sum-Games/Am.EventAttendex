@@ -20,8 +20,6 @@ export type DayFilter = "All" | "20 Feb" | "21 Feb"
 export interface EventsFilterProps {
   searchQuery: string
   setSearchQuery: (query: string) => void
-  selectedOrg: string
-  setSelectedOrg: (org: string) => void
   selectedDay: DayFilter
   setSelectedDay: (day: DayFilter) => void
 }

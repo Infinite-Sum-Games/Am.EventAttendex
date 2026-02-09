@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import type { EventCardProps } from "@/types/events"
 
@@ -39,9 +33,6 @@ export function EventCard({
         <CardTitle className="text-xl font-bold text-white/90">
           {event.name}
         </CardTitle>
-        <CardDescription className="text-sm font-medium text-white/60">
-          {event.organizer}
-        </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">
         <div

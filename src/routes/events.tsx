@@ -13,7 +13,6 @@ export const Route = createFileRoute("/events")({
 
 function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedOrg, setSelectedOrg] = useState("All organizers")
   const [selectedDay, setSelectedDay] = useState<DayFilter>("All")
 
   // Sidebar state with swipe support
@@ -24,13 +23,11 @@ function EventsPage() {
       const matchesSearch =
         event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.organizer.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesOrg =
-        selectedOrg === "All organizers" || event.organizer === selectedOrg
       const matchesDay = selectedDay === "All" || event.day === selectedDay
 
-      return matchesSearch && matchesOrg && matchesDay
+      return matchesSearch && matchesDay
     })
-  }, [searchQuery, selectedOrg, selectedDay])
+  }, [searchQuery, selectedDay])
 
   return (
     <div
@@ -58,8 +55,6 @@ function EventsPage() {
           <EventsFilter
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            selectedOrg={selectedOrg}
-            setSelectedOrg={setSelectedOrg}
             selectedDay={selectedDay}
             setSelectedDay={setSelectedDay}
           />
