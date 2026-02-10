@@ -1,8 +1,25 @@
 export const apiEndpoints = {
   LOGIN: "/auth/login",
 
-  // attendance
-  // SOLO ATTENDANCE ENDPOINT
-  MARK_ATTENDANCE: (studentId: string, scheduleId: string) =>
+  // ATTENDANCE SCANNER ENDPOINTS
+  // solo-attendance-scanner.tsx
+  // isTeamEvent = false
+  MARK_INDIVIDUAL_ATTENDANCE: (studentId: string, scheduleId: string) =>
     `/solo/mark/BOTH/${studentId}/${scheduleId}`,
+  // isTeamEvent = true
+  MARK_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
+    `/attendance/team/mark/BOTH/${studentId}/${scheduleId}`,
+
+  // duo-attendance-scanner.tsx
+  // isTeamEvent = false
+  CHECKIN_INDIVIDUAL_ATTENDANCE: (studentId: string, scheduleId: string) =>
+    `/api/v1/attendance/solo/mark/IN/${studentId}/${scheduleId}`,
+  CHECKOUT_INDIVIDUAL_ATTENDANCE: (studentId: string, scheduleId: string) =>
+    `/api/v1/attendance/solo/mark/OUT/${studentId}/${scheduleId}`,
+
+  // isTeamEvent = true
+  CHECKIN_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
+    `/api/v1/attendance/team/mark/IN/${studentId}/${scheduleId}`,
+  CHECKOUT_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
+    `/api/v1/attendance/team/mark/OUT/${studentId}/${scheduleId}`,
 } as const
