@@ -5,7 +5,7 @@ export const apiEndpoints = {
   // solo-attendance-scanner.tsx
   // isTeamEvent = false
   MARK_INDIVIDUAL_ATTENDANCE: (studentId: string, scheduleId: string) =>
-    `/solo/mark/BOTH/${studentId}/${scheduleId}`,
+    `/attendance/solo/mark/BOTH/${studentId}/${scheduleId}`,
   // isTeamEvent = true
   MARK_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
     `/attendance/team/mark/BOTH/${studentId}/${scheduleId}`,
