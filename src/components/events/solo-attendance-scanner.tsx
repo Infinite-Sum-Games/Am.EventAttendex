@@ -14,28 +14,37 @@ import {
 type ScanStatus = "idle" | "success" | "error"
 
 interface SoloAttendanceScannerProps {
-  eventName?: string
+  eventName: string
   scheduleId: string
-  onClose?: () => void
+  onClose: () => void
+  isTeamEvent: boolean
 }
 
 export function SoloAttendanceScanner({
   eventName,
   scheduleId,
   onClose,
+  isTeamEvent = false,
 }: SoloAttendanceScannerProps) {
   const [status, setStatus] = useState<ScanStatus>("idle")
-  const [isScanning, setIsScanning] = useState(true)
   const [cameraError, setCameraError] = useState(false)
   const [facingMode, setFacingMode] = useState<"environment" | "user">(
     "environment"
   )
 
   const { mutate: markAttendance } = useMutation({
-    mutationFn: (payload: MarkAttendancePayload) =>
-      api.post(
-        apiEndpoints.MARK_ATTENDANCE(payload.studentId, payload.scheduleId)
-      ),
+    mutationFn: (payload: MarkAttendancePayload) => {
+      const url = isTeamEvent
+        ? apiEndpoints.MARK_TEAM_ATTENDANCE(
+            payload.studentId,
+            payload.scheduleId
+          )
+        : apiEndpoints.MARK_INDIVIDUAL_ATTENDANCE(
+            payload.studentId,
+            payload.scheduleId
+          )
+      return api.post(url)
+    },
     onSuccess: () => {
       setStatus("success")
       toast.success("Attendance marked successfully")
@@ -53,7 +62,6 @@ export function SoloAttendanceScanner({
   const resetStatusAfterDelay = useCallback(() => {
     setTimeout(() => {
       setStatus("idle")
-      setIsScanning(true)
     }, 2000)
   }, [])
 
@@ -148,13 +156,13 @@ export function SoloAttendanceScanner({
             <h3 className="text-white font-black text-xl uppercase tracking-tighter">
               Camera Blocked
             </h3>
-            <p className="text-zinc-400 text-sm mt-3 max-w-[280px] leading-relaxed">
+            <p className="text-zinc-400 text-sm mt-3 max-w-70 leading-relaxed">
               We can't access your camera. Please check your browser permissions
               and refresh to continue scanning.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-10 w-full max-w-[200px] py-4 rounded-2xl bg-white text-black font-bold text-sm active:scale-95 transition-all shadow-xl"
+              className="mt-10 w-full max-w-50 py-4 rounded-2xl bg-white text-black font-bold text-sm active:scale-95 transition-all shadow-xl"
             >
               Refresh Page
             </button>
@@ -252,12 +260,20 @@ export function SoloAttendanceScanner({
 
               <div className="flex-1 min-w-0">
                 <h3 className="text-white font-bold text-xs uppercase tracking-tight">
-                  Solo Attendance Mode
+                  SINGLE ATTENDANCE MODE
                 </h3>
                 <p className="text-white/50 text-[11px] leading-tight mt-0.5">
-                  Attendance is marked only{" "}
-                  <span className="text-primary font-semibold">one-time</span>.
-                  Your check-in is final once the green screen appears.
+                  {isTeamEvent ? (
+                    "Only one member of the team needs to mark attendance for the whole team."
+                  ) : (
+                    <>
+                      Attendance is marked only{" "}
+                      <span className="text-primary font-semibold">
+                        one-time
+                      </span>
+                      . Your check-in is final once the green screen appears.
+                    </>
+                  )}
                 </p>
               </div>
             </div>
