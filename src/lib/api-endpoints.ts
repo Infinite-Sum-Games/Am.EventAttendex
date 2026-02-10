@@ -13,13 +13,13 @@ export const apiEndpoints = {
   // duo-attendance-scanner.tsx
   // isTeamEvent = false
   CHECKIN_INDIVIDUAL_ATTENDANCE: (studentId: string, scheduleId: string) =>
-    `/api/v1/attendance/solo/mark/IN/${studentId}/${scheduleId}`,
+    `/attendance/solo/mark/IN/${studentId}/${scheduleId}`,
   CHECKOUT_INDIVIDUAL_ATTENDANCE: (studentId: string, scheduleId: string) =>
-    `/api/v1/attendance/solo/mark/OUT/${studentId}/${scheduleId}`,
+    `/attendance/solo/mark/OUT/${studentId}/${scheduleId}`,
 
   // isTeamEvent = true
   CHECKIN_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
-    `/api/v1/attendance/team/mark/IN/${studentId}/${scheduleId}`,
+    `/attendance/team/mark/IN/${studentId}/${scheduleId}`,
   CHECKOUT_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
-    `/api/v1/attendance/team/mark/OUT/${studentId}/${scheduleId}`,
+    `/attendance/team/mark/OUT/${studentId}/${scheduleId}`,
 } as const
