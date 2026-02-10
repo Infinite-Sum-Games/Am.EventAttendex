@@ -1,4 +1,5 @@
-import { SoloAttendanceScanner } from "@/components/events/solo-attendance-scanner"
+import { DuoAttendanceScanner } from "@/components/events/duo-attendance-scanner"
+// import { SoloAttendanceScanner } from "@/components/events/solo-attendance-scanner"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/scanner")({
@@ -11,10 +12,17 @@ function ScannerPage() {
 
   return (
     <div className="min-h-screen w-full bg-black">
-      <SoloAttendanceScanner
+      {/* <SoloAttendanceScanner
+        eventName="Sample Event"
+        scheduleId="550e8400-e29b-41d4-a716-446655440000"
+        isTeamEvent={true}
+        onClose={() => navigate({ to: ".." })}
+      /> */}
+      <DuoAttendanceScanner
         eventName="Sample Event"
         scheduleId="550e8400-e29b-41d4-a716-446655440000"
         onClose={() => navigate({ to: ".." })}
+        isTeamEvent={true}
       />
     </div>
   )
