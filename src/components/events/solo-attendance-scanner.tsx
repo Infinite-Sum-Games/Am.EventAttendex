@@ -126,7 +126,7 @@ export function SoloAttendanceScanner({
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
             <span className="text-white/60 text-[10px] font-medium uppercase tracking-widest">
-              Live Scanner
+              {isTeamEvent ? "Group Event" : "Individual Event"}
             </span>
           </div>
         </div>
@@ -231,15 +231,15 @@ export function SoloAttendanceScanner({
             {status === "idle" && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10">
                 <div className="w-64 h-64 relative">
-                  <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-primary rounded-tl-xl" />
-                  <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-primary rounded-tr-xl" />
-                  <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-primary rounded-bl-xl" />
-                  <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-primary rounded-br-xl" />
+                  <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-green-500 rounded-tl-xl" />
+                  <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-green-500 rounded-tr-xl" />
+                  <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-green-500 rounded-bl-xl" />
+                  <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-green-500 rounded-br-xl" />
 
-                  <div className="absolute top-0 left-0 w-full h-full bg-primary/5 rounded-xl border border-white/20" />
+                  <div className="absolute top-0 left-0 w-full h-full bg-green-500/5 rounded-xl border border-white/20" />
 
-                  <div className="absolute top-1/2 left-4 right-4 h-1 bg-primary/50 blur-[2px] animate-[scan_2s_ease-in-out_infinite]" />
-                  <div className="absolute top-1/2 left-2 right-2 h-0.5 bg-primary animate-[scan_2s_ease-in-out_infinite] shadow-[0_0_15px_rgba(var(--primary),0.8)]" />
+                  <div className="absolute top-1/2 left-4 right-4 h-1 bg-green-500/50 blur-[2px] animate-[scan_2s_ease-in-out_infinite]" />
+                  <div className="absolute top-1/2 left-2 right-2 h-0.5 bg-green-500 animate-[scan_2s_ease-in-out_infinite] shadow-[0_0_15px] shadow-green-500/80" />
                 </div>
               </div>
             )}
@@ -250,11 +250,11 @@ export function SoloAttendanceScanner({
       {/* Bottom Sheet */}
       {!cameraError && (
         <div className="absolute bottom-0 inset-x-0 z-20">
-          <div className="bg-zinc-900/95 backdrop-blur-2xl border-t border-white/10 rounded-t-2xl p-4 pb-6 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-500 ease-out">
+          <div className="bg-zinc-900/95 backdrop-blur-2xl border-t border-white/10 rounded-t-2xl p-4 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-500 ease-out">
             <div className="w-10 h-1 bg-white/10 rounded-full mx-auto mb-3" />
 
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
+              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 shrink-0 border border-green-500/20">
                 <Info className="w-4 h-4" />
               </div>
 
