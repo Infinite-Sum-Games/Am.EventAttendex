@@ -183,13 +183,13 @@ export function DuoAttendanceScanner({
             <h3 className="text-white font-black text-xl uppercase tracking-tighter">
               Camera Blocked
             </h3>
-            <p className="text-zinc-400 text-sm mt-3 max-w-[280px] leading-relaxed">
+            <p className="text-zinc-400 text-sm mt-3 max-w-70 leading-relaxed">
               We can't access your camera. Please check your browser permissions
               and refresh to continue scanning.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-10 w-full max-w-[200px] py-4 rounded-2xl bg-white text-black font-bold text-sm active:scale-95 transition-all shadow-xl"
+              className="mt-10 w-full max-w-50 py-4 rounded-2xl bg-white text-black font-bold text-sm active:scale-95 transition-all shadow-xl"
             >
               Refresh Page
             </button>
