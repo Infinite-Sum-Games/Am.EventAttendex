@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { CalendarDays, LogOut } from "lucide-react"
+import { CalendarDays, LogOut, Loader2 } from "lucide-react"
 import { EventCard } from "@/components/events/event-card"
 import { EventsFilter } from "@/components/events/events-filter"
-import { MOOCK_EVENTS } from "@/components/events/mock-data"
+import { useOrganizerEvents } from "@/hooks/use-events"
 import { Button } from "@/components/ui/button"
 import type { DayFilter } from "@/types/events"
 
@@ -16,8 +16,11 @@ function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDay, setSelectedDay] = useState<DayFilter>("All")
 
+  const { data: events, isLoading, isError } = useOrganizerEvents()
+
   const filteredEvents = useMemo(() => {
-    return MOOCK_EVENTS.filter((event) => {
+    if (!events) return []
+    return events.filter((event) => {
       const matchesSearch =
         event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.organizer.toLowerCase().includes(searchQuery.toLowerCase())
@@ -25,11 +28,36 @@ function EventsPage() {
 
       return matchesSearch && matchesDay
     })
-  }, [searchQuery, selectedDay])
+  }, [searchQuery, selectedDay, events])
 
   const handleLogout = () => {
     // TODO: Implement actual logout logic
     navigate({ to: "/login" })
+  }
+
+  if (isLoading) {
+    return (
+      <div
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{ backgroundColor: "var(--navy-dark)" }}
+      >
+        <Loader2 className="h-10 w-10 text-amber-400 animate-spin" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div
+        className="min-h-screen w-full flex items-center justify-center flex-col gap-4"
+        style={{ backgroundColor: "var(--navy-dark)" }}
+      >
+        <p className="text-white/60">Failed to load events.</p>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </div>
+    )
   }
 
   return (

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarDays, Clock, MapPin, Users, User } from "lucide-react"
+import { CalendarDays, Clock, MapPin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Schedule } from "@/types/events"
 

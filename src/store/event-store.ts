@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import type { Event, Schedule, Participant } from "@/types/events"
+import type { Event, Schedule } from "@/types/events"
 
 interface EventStoreState {
   selectedEvent: Event | null

@@ -4,11 +4,7 @@ import { ArrowLeft, Search, Users, QrCode } from "lucide-react"
 import { useEventStore } from "@/store/event-store"
 import { SoloAttendanceScanner } from "@/components/events/solo-attendance-scanner"
 import { DuoAttendanceScanner } from "@/components/events/duo-attendance-scanner"
-import {
-  MOCK_SCHEDULES,
-  MOCK_PARTICIPANTS,
-  MOOCK_EVENTS,
-} from "@/components/events/mock-data"
+import { MOCK_SCHEDULES, MOOCK_EVENTS } from "@/components/events/mock-data"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -27,6 +23,15 @@ export const Route = createFileRoute("/events/$eventId/schedules/$scheduleId")({
   component: ScheduleParticipantPage,
 })
 
+import {
+  useParticipants,
+  useMarkAttendance,
+  useUnmarkAttendance,
+} from "@/hooks/use-attendance"
+import { Loader2 } from "lucide-react"
+
+// ... imports ...
+
 function ScheduleParticipantPage() {
   const { eventId, scheduleId } = Route.useParams()
   const { selectedEvent, setSelectedEvent, setSelectedSchedule } =
@@ -37,11 +42,26 @@ function ScheduleParticipantPage() {
   const [page, setPage] = useState(1)
   const itemsPerPage = 10
 
-  // Simulate Data Fetching
+  // API Fetch
+  const {
+    data: participantsData,
+    isLoading: isLoadingParticipants,
+    isError: isErrorParticipants,
+  } = useParticipants(eventId, scheduleId)
+  const { mutate: markAttendance } = useMarkAttendance()
+  const { mutate: unmarkAttendance } = useUnmarkAttendance()
+
+  if (isErrorParticipants) {
+    // Simple error handling
+    console.error("Failed to fetch participants")
+  }
+
+  // Simulate Data Fetching for Event/Schedule (or use store if already populated)
+  // We use store or mock fetch for metadata as before, but participants come from API
   const event = MOOCK_EVENTS.find((e) => e.id === eventId)
   const schedule = MOCK_SCHEDULES[eventId]?.find((s) => s.id === scheduleId)
 
-  // Local state for participants to handle optimistic updates
+  // Local state for participants to handle optimistic updates or just syncing
   const [participants, setParticipants] = useState<Participant[]>([])
   const [showScanner, setShowScanner] = useState(false)
 
@@ -50,9 +70,10 @@ function ScheduleParticipantPage() {
     if (event) setSelectedEvent(event)
     if (schedule) setSelectedSchedule(schedule)
 
-    // Load participants
-    const data = MOCK_PARTICIPANTS[scheduleId] ?? []
-    setParticipants(data)
+    // Sync participants from API
+    if (participantsData) {
+      setParticipants(participantsData)
+    }
   }, [
     eventId,
     scheduleId,
@@ -60,6 +81,7 @@ function ScheduleParticipantPage() {
     schedule,
     setSelectedEvent,
     setSelectedSchedule,
+    participantsData,
   ])
 
   // Filter Logic
@@ -85,42 +107,48 @@ function ScheduleParticipantPage() {
     participantId: string,
     type: "CHECKIN" | "CHECKOUT" | "BOTH"
   ) => {
-    // Update local state to reflect change - Simulate API call
-    setParticipants((prev) =>
-      prev.map((p) => {
-        if (p.id === participantId) {
-          return {
-            ...p,
-            checkInStatus:
-              type === "CHECKIN" || type === "BOTH" ? true : p.checkInStatus,
-            checkOutStatus:
-              type === "CHECKOUT" || type === "BOTH" ? true : p.checkOutStatus,
-            attendanceStatus: type === "BOTH" ? true : p.attendanceStatus,
-          }
-        }
-        return p
-      })
-    )
+    if (!schedule) return
+
+    const studentId = participantId // Assuming participantId is the studentId
+    const isTeam = schedule.type === "GROUP"
+    const markingType = schedule.markingType
+
+    markAttendance({
+      studentId,
+      scheduleId,
+      type,
+      isTeam,
+      markingType,
+    })
   }
 
   const handleUnmark = (
     participantId: string,
     type: "CHECKIN" | "CHECKOUT" | "BOTH"
   ) => {
-    setParticipants((prev) =>
-      prev.map((p) => {
-        if (p.id === participantId) {
-          return {
-            ...p,
-            checkInStatus:
-              type === "CHECKIN" || type === "BOTH" ? false : p.checkInStatus,
-            checkOutStatus:
-              type === "CHECKOUT" || type === "BOTH" ? false : p.checkOutStatus,
-            attendanceStatus: type === "BOTH" ? false : p.attendanceStatus,
-          }
-        }
-        return p
-      })
+    if (!schedule) return
+
+    const studentId = participantId
+    const isTeam = schedule.type === "GROUP"
+    const markingType = schedule.markingType
+
+    unmarkAttendance({
+      studentId,
+      scheduleId,
+      type,
+      isTeam,
+      markingType,
+    })
+  }
+
+  if (isLoadingParticipants) {
+    return (
+      <div
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{ backgroundColor: "var(--navy-dark)" }}
+      >
+        <Loader2 className="h-10 w-10 text-amber-400 animate-spin" />
+      </div>
     )
   }
 
