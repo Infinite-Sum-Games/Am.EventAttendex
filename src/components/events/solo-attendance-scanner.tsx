@@ -2,14 +2,12 @@ import { useState, useCallback } from "react"
 import { Scanner } from "@yudiel/react-qr-scanner"
 import { Check, X, Camera, ArrowLeft, Info, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
-import { useMutation } from "@tanstack/react-query"
-import api from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api-endpoints"
 import { cn } from "@/lib/utils"
 import {
   markAttendanceSchema,
   type MarkAttendancePayload,
 } from "@/schemas/attendance"
+import { useMarkAttendance } from "@/hooks/use-attendance"
 
 type ScanStatus = "idle" | "success" | "error"
 
@@ -32,32 +30,32 @@ export function SoloAttendanceScanner({
     "environment"
   )
 
-  const { mutate: markAttendance } = useMutation({
-    mutationFn: (payload: MarkAttendancePayload) => {
-      const url = isTeamEvent
-        ? apiEndpoints.MARK_TEAM_ATTENDANCE(
-            payload.studentId,
-            payload.scheduleId
-          )
-        : apiEndpoints.MARK_INDIVIDUAL_ATTENDANCE(
-            payload.studentId,
-            payload.scheduleId
-          )
-      return api.post(url)
-    },
-    onSuccess: () => {
-      setStatus("success")
-      toast.success("Attendance marked successfully")
-      resetStatusAfterDelay()
-    },
-    onError: (error: any) => {
-      setStatus("error")
-      const errorMessage =
-        error.response?.data?.message || "Failed to mark attendance"
-      toast.error(errorMessage)
-      resetStatusAfterDelay()
-    },
-  })
+  const { mutate: markAttendance } = useMarkAttendance()
+
+  const handleMark = (payload: MarkAttendancePayload) => {
+    markAttendance(
+      {
+        studentId: payload.studentId,
+        scheduleId: payload.scheduleId,
+        type: "BOTH", // Solo matches "BOTH" in our hook logic
+        isTeam: isTeamEvent,
+        markingType: "SOLO",
+      },
+      {
+        onSuccess: () => {
+          setStatus("success")
+          resetStatusAfterDelay()
+        },
+        onError: (error: any) => {
+          setStatus("error")
+          const errorMessage =
+            error.response?.data?.message || "Failed to mark attendance"
+          toast.error(errorMessage)
+          resetStatusAfterDelay()
+        },
+      }
+    )
+  }
 
   const resetStatusAfterDelay = useCallback(() => {
     setTimeout(() => {
@@ -96,7 +94,7 @@ export function SoloAttendanceScanner({
         return
       }
 
-      markAttendance(validation.data)
+      handleMark(validation.data)
     },
     [status, scheduleId, markAttendance, resetStatusAfterDelay]
   )
