@@ -14,22 +14,22 @@ import {
   LogIn,
   LogOut,
 } from "lucide-react"
-import type { Schedule, Participant } from "@/types/events"
+import type { Participant } from "@/types/events"
 
 interface AttendanceActionsProps {
   participant: Participant
-  schedule: Schedule
+  markingType: "SOLO" | "DUO"
   onMark: (type: "CHECKIN" | "CHECKOUT" | "BOTH") => void
   onUnmark: (type: "CHECKIN" | "CHECKOUT" | "BOTH") => void
 }
 
 export function AttendanceActions({
   participant,
-  schedule,
+  markingType,
   onMark,
   onUnmark,
 }: AttendanceActionsProps) {
-  const isDuo = schedule.markingType === "DUO"
+  const isDuo = markingType === "DUO"
   // const isGroup = schedule.type === "GROUP" // Logic might differ if needed, but actions are similar
 
   return (
@@ -56,7 +56,7 @@ export function AttendanceActions({
             {/* DUO MARKING: Check In / Check Out */}
             <DropdownMenuItem
               onClick={() => onMark("CHECKIN")}
-              disabled={participant.checkInStatus}
+              disabled={!!participant.check_in}
               className="focus:bg-green-900/50 focus:text-green-300 cursor-pointer"
             >
               <LogIn className="mr-2 h-4 w-4 text-green-400" />
@@ -65,7 +65,7 @@ export function AttendanceActions({
 
             <DropdownMenuItem
               onClick={() => onMark("CHECKOUT")}
-              disabled={participant.checkOutStatus}
+              disabled={!!participant.check_out}
               className="focus:bg-blue-900/50 focus:text-blue-300 cursor-pointer"
             >
               <LogOut className="mr-2 h-4 w-4 text-blue-400" />
@@ -76,7 +76,7 @@ export function AttendanceActions({
 
             <DropdownMenuItem
               onClick={() => onUnmark("CHECKIN")}
-              disabled={!participant.checkInStatus}
+              disabled={!participant.check_in}
               className="focus:bg-red-900/50 focus:text-red-300 cursor-pointer"
             >
               <XCircle className="mr-2 h-4 w-4 text-red-400" />
@@ -85,7 +85,7 @@ export function AttendanceActions({
 
             <DropdownMenuItem
               onClick={() => onUnmark("CHECKOUT")}
-              disabled={!participant.checkOutStatus}
+              disabled={!participant.check_out}
               className="focus:bg-red-900/50 focus:text-red-300 cursor-pointer"
             >
               <XCircle className="mr-2 h-4 w-4 text-red-400" />
@@ -97,7 +97,7 @@ export function AttendanceActions({
             {/* SOLO MARKING: One time mark */}
             <DropdownMenuItem
               onClick={() => onMark("BOTH")}
-              disabled={participant.attendanceStatus}
+              disabled={!!participant.check_in}
               className="focus:bg-green-900/50 focus:text-green-300 cursor-pointer"
             >
               <CheckCircle2 className="mr-2 h-4 w-4 text-green-400" />
@@ -108,7 +108,7 @@ export function AttendanceActions({
 
             <DropdownMenuItem
               onClick={() => onUnmark("BOTH")}
-              disabled={!participant.attendanceStatus}
+              disabled={!participant.check_in}
               className="focus:bg-red-900/50 focus:text-red-300 cursor-pointer"
             >
               <XCircle className="mr-2 h-4 w-4 text-red-400" />

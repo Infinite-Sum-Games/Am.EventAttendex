@@ -9,9 +9,22 @@ export function useOrganizerEvents() {
     queryFn: async () => {
       // Fetch organizer events
       const response = await axiosClient.get(apiEndpoints.GET_ORGANIZER_EVENTS)
-      // We assume the response data is the list of events directly or in a standard wrapper
-      // Adjust this if your API returns { data: [...] } or similiar
-      return response.data as Event[]
+      console.log("Events API Response:", response.data) // Debugging
+
+      // Handle different response structures
+      if (Array.isArray(response.data)) {
+        return response.data as Event[]
+      } else if (response.data && Array.isArray((response.data as any).data)) {
+        return (response.data as any).data as Event[]
+      } else if (
+        response.data &&
+        Array.isArray((response.data as any).events)
+      ) {
+        return (response.data as any).events as Event[]
+      }
+
+      console.error("Unexpected API response structure:", response.data)
+      return [] // Return empty array to prevent filter error
     },
   })
 }

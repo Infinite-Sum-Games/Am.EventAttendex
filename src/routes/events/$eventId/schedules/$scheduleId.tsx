@@ -4,7 +4,6 @@ import { ArrowLeft, Search, Users, QrCode } from "lucide-react"
 import { useEventStore } from "@/store/event-store"
 import { SoloAttendanceScanner } from "@/components/events/solo-attendance-scanner"
 import { DuoAttendanceScanner } from "@/components/events/duo-attendance-scanner"
-import { MOCK_SCHEDULES, MOOCK_EVENTS } from "@/components/events/mock-data"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -28,6 +27,7 @@ import {
   useMarkAttendance,
   useUnmarkAttendance,
 } from "@/hooks/use-attendance"
+import { useOrganizerEvents } from "@/hooks/use-events"
 import { Loader2 } from "lucide-react"
 
 // ... imports ...
@@ -56,10 +56,19 @@ function ScheduleParticipantPage() {
     console.error("Failed to fetch participants")
   }
 
-  // Simulate Data Fetching for Event/Schedule (or use store if already populated)
-  // We use store or mock fetch for metadata as before, but participants come from API
-  const event = MOOCK_EVENTS.find((e) => e.id === eventId)
-  const schedule = MOCK_SCHEDULES[eventId]?.find((s) => s.id === scheduleId)
+  // Retrieve event from store or query (not ideal if deep linking without data, but for now relies on store/cache)
+  // In a real app, useQuery with select or similar.
+  // Accessing query client cache directly or using the hook again would be better.
+  const { data: events } = useOrganizerEvents()
+
+  const event = useMemo(
+    () => events?.find((e) => e.event_id === eventId),
+    [events, eventId]
+  )
+  const schedule = useMemo(
+    () => event?.schedules.find((s) => s.id === scheduleId),
+    [event, scheduleId]
+  )
 
   // Local state for participants to handle optimistic updates or just syncing
   const [participants, setParticipants] = useState<Participant[]>([])
@@ -86,12 +95,17 @@ function ScheduleParticipantPage() {
 
   // Filter Logic
   const filteredParticipants = useMemo(() => {
+    if (!Array.isArray(participants)) return []
     return participants.filter(
       (p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.teamName &&
-          p.teamName.toLowerCase().includes(searchQuery.toLowerCase()))
+        (p.student_name || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (p.student_email || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (p.team_name &&
+          p.team_name.toLowerCase().includes(searchQuery.toLowerCase()))
     )
   }, [participants, searchQuery])
 
@@ -107,11 +121,11 @@ function ScheduleParticipantPage() {
     participantId: string,
     type: "CHECKIN" | "CHECKOUT" | "BOTH"
   ) => {
-    if (!schedule) return
+    if (!schedule || !event) return
 
     const studentId = participantId // Assuming participantId is the studentId
-    const isTeam = schedule.type === "GROUP"
-    const markingType = schedule.markingType
+    const isTeam = event.is_group
+    const markingType = event.attendance_mode
 
     markAttendance({
       studentId,
@@ -126,11 +140,11 @@ function ScheduleParticipantPage() {
     participantId: string,
     type: "CHECKIN" | "CHECKOUT" | "BOTH"
   ) => {
-    if (!schedule) return
+    if (!schedule || !event) return
 
     const studentId = participantId
-    const isTeam = schedule.type === "GROUP"
-    const markingType = schedule.markingType
+    const isTeam = event.is_group
+    const markingType = event.attendance_mode
 
     unmarkAttendance({
       studentId,
@@ -159,8 +173,8 @@ function ScheduleParticipantPage() {
     )
   }
 
-  const isGroup = schedule.type === "GROUP"
-  const isDuo = schedule.markingType === "DUO"
+  const isGroup = event?.is_group ?? false
+  const isDuo = event?.attendance_mode === "DUO"
 
   return (
     <div
@@ -179,10 +193,10 @@ function ScheduleParticipantPage() {
           </Link>
           <div className="flex flex-col">
             <span className="text-xs text-white/40 uppercase tracking-widest">
-              {selectedEvent?.name}
+              {selectedEvent?.event_name}
             </span>
             <h1 className="text-xl font-bold text-white/90">
-              {schedule.title}
+              {schedule.title || "Participant details"}
             </h1>
           </div>
         </div>
@@ -219,25 +233,27 @@ function ScheduleParticipantPage() {
               {paginatedParticipants.length > 0 ? (
                 paginatedParticipants.map((p) => (
                   <TableRow
-                    key={p.id}
+                    key={p.attendance_id}
                     className="border-white/5 hover:bg-white/5 transition-colors"
                   >
                     <TableCell>
                       <div className="flex flex-col gap-1">
                         <span className="font-medium text-white/90">
-                          {p.name}
+                          {p.student_name}
                         </span>
-                        <span className="text-xs text-white/50">{p.email}</span>
+                        <span className="text-xs text-white/50">
+                          {p.student_email}
+                        </span>
 
-                        {/* Team Name badge moved here */}
-                        {isGroup && p.teamName && (
+                        {/* Team Name badge - checking if team_name exists (it might not be in API yet) */}
+                        {isGroup && p.team_name && (
                           <div className="flex items-start">
                             <Badge
                               variant="secondary"
                               className="mt-1 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 text-[10px] h-5 px-1.5 gap-1"
                             >
                               <Users size={10} />
-                              {p.teamName}
+                              {p.team_name}
                             </Badge>
                           </div>
                         )}
@@ -250,9 +266,9 @@ function ScheduleParticipantPage() {
                           // DUO Status badges
                           <div className="flex flex-col sm:flex-row gap-2">
                             <Badge
-                              variant={p.checkInStatus ? "default" : "outline"}
+                              variant={p.check_in ? "default" : "outline"}
                               className={
-                                p.checkInStatus
+                                p.check_in
                                   ? "bg-green-500/20 text-green-300 hover:bg-green-500/30 border-green-500/50 justify-center"
                                   : "border-white/20 text-white/40 justify-center"
                               }
@@ -260,9 +276,9 @@ function ScheduleParticipantPage() {
                               IN
                             </Badge>
                             <Badge
-                              variant={p.checkOutStatus ? "default" : "outline"}
+                              variant={p.check_out ? "default" : "outline"}
                               className={
-                                p.checkOutStatus
+                                p.check_out
                                   ? "bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border-blue-500/50 justify-center"
                                   : "border-white/20 text-white/40 justify-center"
                               }
@@ -271,16 +287,16 @@ function ScheduleParticipantPage() {
                             </Badge>
                           </div>
                         ) : (
-                          // SOLO Status badge
+                          // SOLO Status badge (Present if check_in is not null)
                           <Badge
-                            variant={p.attendanceStatus ? "default" : "outline"}
+                            variant={p.check_in ? "default" : "outline"}
                             className={
-                              p.attendanceStatus
+                              p.check_in
                                 ? "bg-green-500/20 text-green-300 hover:bg-green-500/30 border-green-500/50"
                                 : "border-white/20 text-white/40"
                             }
                           >
-                            {p.attendanceStatus ? "PRESENT" : "ABSENT"}
+                            {p.check_in ? "PRESENT" : "ABSENT"}
                           </Badge>
                         )}
                       </div>
@@ -288,9 +304,9 @@ function ScheduleParticipantPage() {
                     <TableCell className="text-right">
                       <AttendanceActions
                         participant={p}
-                        schedule={schedule}
-                        onMark={(type) => handleMark(p.id, type)}
-                        onUnmark={(type) => handleUnmark(p.id, type)}
+                        markingType={event?.attendance_mode || "SOLO"}
+                        onMark={(type) => handleMark(p.student_id, type)}
+                        onUnmark={(type) => handleUnmark(p.student_id, type)}
                       />
                     </TableCell>
                   </TableRow>
@@ -348,14 +364,14 @@ function ScheduleParticipantPage() {
         {showScanner &&
           (isDuo ? (
             <DuoAttendanceScanner
-              eventName={selectedEvent?.name || "Event"}
+              eventName={selectedEvent?.event_name || "Event"}
               scheduleId={scheduleId}
               onClose={() => setShowScanner(false)}
               isTeamEvent={isGroup}
             />
           ) : (
             <SoloAttendanceScanner
-              eventName={selectedEvent?.name || "Event"}
+              eventName={selectedEvent?.event_name || "Event"}
               scheduleId={scheduleId}
               onClose={() => setShowScanner(false)}
               isTeamEvent={isGroup}

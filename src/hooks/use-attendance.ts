@@ -13,9 +13,18 @@ export function useParticipants(eventId: string, scheduleId: string) {
       // Fetch participants for a specific schedule
       // Note: Endpoint name GET_EVENT_SCHEDULES is confusing but based on usage it seems to be for this
       const response = await axiosClient.get(
-        apiEndpoints.GET_EVENT_SCHEDULES(eventId, scheduleId)
+        apiEndpoints.GET_EVENT_PARTICIPANTS(eventId, scheduleId)
       )
-      return response.data as Participant[]
+
+      // Safe parsing: Check if it's strictly an array or wrapped
+      const data = response.data
+      if (Array.isArray(data)) return data as Participant[]
+      if (data && Array.isArray(data.participants))
+        return data.participants as Participant[]
+      if (data && Array.isArray(data.data)) return data.data as Participant[]
+
+      console.warn("useParticipants: Expected array but got:", data)
+      return []
     },
     enabled: !!eventId && !!scheduleId,
   })
@@ -165,15 +174,8 @@ export function useUnmarkAttendance() {
 
       if (!endpoint) throw new Error("Invalid unmarking configuration")
 
-      // Unmarking usually is also a POST or DELETE? Assuming DELETE or POST based on typical conventions,
-      // but generated endpoints imply specific URLs. Most likely these are POST or DELETE.
-      // Checking api-endpoints.ts... it just gives the URL string.
-      // Typically 'unMark' implies a state change, likely DELETE or POST.
-      // I'll stick with POST for now unless I see otherwise in the backend docs (which I don't have).
-      // Or maybe DELETE? `axiosClient.delete(endpoint)`
-      // Let's assume POST for /unMark/... pattern unless commonly RESTful.
-      // Actually, safest is usually POST for RPC-style "unMark" URLs.
-      const response = await axiosClient.post(endpoint)
+      // Backend expects DELETE for unmark routes
+      const response = await axiosClient.delete(endpoint)
       return response.data
     },
     onSuccess: (_, { scheduleId }) => {
