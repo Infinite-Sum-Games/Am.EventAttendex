@@ -1,16 +1,59 @@
 import { useState, useEffect, useRef } from "react"
-import { LogOut, X, Menu } from "lucide-react"
+import { LogOut, X, Menu, Loader2 } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
+import { useQuery, useMutation } from "@tanstack/react-query"
+import axiosClient from "@/lib/axios"
+import { apiEndpoints } from "@/lib/api-endpoints"
 import { cn } from "@/lib/utils"
 import type { SidebarProps } from "@/types/sidebar"
+
+interface OrganizerProfile {
+  name: string
+  email: string
+  id: string
+}
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
 
+  // Fetch Session
+  const {
+    data: user,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["organizer-session"],
+    queryFn: async () => {
+      const response = await axiosClient.get(apiEndpoints.ORGANIZER_SESSION)
+      return response.data as OrganizerProfile
+    },
+    retry: false,
+  })
+
+  // Logout Mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await axiosClient.get(apiEndpoints.ORGANIZER_LOGOUT)
+    },
+    onSuccess: () => {
+      navigate({ to: "/login" })
+    },
+    onError: () => {
+      // Force logout even if API fails
+      navigate({ to: "/login" })
+    },
+  })
+
   const handleLogout = () => {
-    // Clear any auth tokens/state here if needed
-    navigate({ to: "/login" })
+    logoutMutation.mutate()
   }
+
+  // Redirect if session invalid
+  useEffect(() => {
+    if (isError) {
+      navigate({ to: "/login" })
+    }
+  }, [isError, navigate])
 
   return (
     <>
@@ -62,36 +105,49 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Footer with Logout */}
         <div className="p-4 border-t border-amber-500/20">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/10 flex items-center justify-center text-amber-500 font-bold shadow-inner">
-                U
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-sm font-medium text-foreground truncate">
-                  User
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  user@pragati.edu
-                </p>
-              </div>
+          {isLoading ? (
+            <div className="flex justify-center p-4">
+              <Loader2 className="animate-spin text-amber-500" />
             </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/10 flex items-center justify-center text-amber-500 font-bold shadow-inner">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {user?.name || "User"}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user?.email || "user@pragati.edu"}
+                  </p>
+                </div>
+              </div>
 
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 p-2 rounded-lg 
-                       text-xs font-medium text-muted-foreground
-                       bg-black/20 backdrop-blur-sm border border-amber-500/30
-                       hover:bg-amber-500/10 hover:text-amber-500 hover:border-amber-500 
-                       transition-all duration-300 group"
-            >
-              <LogOut
-                size={14}
-                className="group-hover:scale-105 transition-transform"
-              />
-              <span>Logout</span>
-            </button>
-          </div>
+              <button
+                onClick={handleLogout}
+                disabled={logoutMutation.isPending}
+                className="w-full flex items-center justify-center gap-2 p-2 rounded-lg 
+                        text-xs font-medium text-muted-foreground
+                        bg-black/20 backdrop-blur-sm border border-amber-500/30
+                        hover:bg-amber-500/10 hover:text-amber-500 hover:border-amber-500 
+                        transition-all duration-300 group disabled:opacity-50"
+              >
+                {logoutMutation.isPending ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <LogOut
+                    size={14}
+                    className="group-hover:scale-105 transition-transform"
+                  />
+                )}
+                <span>
+                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     </>
