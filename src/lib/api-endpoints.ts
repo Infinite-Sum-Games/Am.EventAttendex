@@ -1,5 +1,7 @@
 export const apiEndpoints = {
-  LOGIN: "/auth/login",
+  ORGANIZER_LOGIN: "/auth/organizer/login",
+  ORGANIZER_LOGOUT: "/auth/organizer/logout",
+  ORGANIZER_SESSION: "/auth/organizer/session",
 
   // events page
   GET_ORGANIZER_EVENTS: "/attendance/list/event",
@@ -48,4 +50,24 @@ export const apiEndpoints = {
     `/attendance/solo/unMark/BOTH/${studentId}/${scheduleId}`,
   UNMARK_TEAM_ATTENDANCE: (studentId: string, scheduleId: string) =>
     `/attendance/team/unMark/BOTH/${studentId}/${scheduleId}`,
+
+  // hospitality page
+  // auth
+  HOSPITALITY_LOGIN: "/accommodation/panel/login",
+  HOSPITALITY_SESSION: "/accommodation/panel/session",
+  HOSPITALITY_LOGOUT: "/accommodation/panel/logout",
+
+  // map QR
+  MAP_QR: "/accommodation/app/map",
+  ACCOMMODATION_DETAILS: (accId: string) => `/accommodation/app/${accId}`,
+
+  GATE_CHECKIN_STATUS: (hospId: string) =>
+    `/accommodation/app/gate/status/check-in/${hospId}`,
+  GATE_CHECKIN: (hospId: string) =>
+    `/accommodation/app/gate/check-in/${hospId}`,
+
+  GATE_CHECKOUT_STATUS: (hospId: string) =>
+    `/accommodation/app/gate/status/check-out/${hospId}`,
+  GATE_CHECKOUT: (hospId: string) =>
+    `/accommodation/app/gate/check-out/${hospId}`,
 } as const
