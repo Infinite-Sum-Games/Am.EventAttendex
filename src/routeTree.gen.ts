@@ -8,103 +8,229 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as ScannerRouteImport } from './routes/scanner'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as rootRouteImport } from "./routes/__root"
+import { Route as ScannerRouteImport } from "./routes/scanner"
+import { Route as HospitalityRouteImport } from "./routes/hospitality"
+import { Route as EventsRouteImport } from "./routes/events"
+import { Route as IndexRouteImport } from "./routes/index"
+import { Route as LoginIndexRouteImport } from "./routes/login/index"
+import { Route as HospitalityIndexRouteImport } from "./routes/hospitality/index"
+import { Route as HospitalityMapQrRouteImport } from "./routes/hospitality/map-qr"
+import { Route as HospitalityGateCheckoutRouteImport } from "./routes/hospitality/gate-checkout"
+import { Route as HospitalityGateCheckinRouteImport } from "./routes/hospitality/gate-checkin"
 
 const ScannerRoute = ScannerRouteImport.update({
-  id: '/scanner',
-  path: '/scanner',
+  id: "/scanner",
+  path: "/scanner",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalityRoute = HospitalityRouteImport.update({
+  id: "/hospitality",
+  path: "/hospitality",
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+  id: "/events",
+  path: "/events",
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
+  id: "/login/",
+  path: "/login/",
   getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalityIndexRoute = HospitalityIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => HospitalityRoute,
+} as any)
+const HospitalityMapQrRoute = HospitalityMapQrRouteImport.update({
+  id: "/map-qr",
+  path: "/map-qr",
+  getParentRoute: () => HospitalityRoute,
+} as any)
+const HospitalityGateCheckoutRoute = HospitalityGateCheckoutRouteImport.update({
+  id: "/gate-checkout",
+  path: "/gate-checkout",
+  getParentRoute: () => HospitalityRoute,
+} as any)
+const HospitalityGateCheckinRoute = HospitalityGateCheckinRouteImport.update({
+  id: "/gate-checkin",
+  path: "/gate-checkin",
+  getParentRoute: () => HospitalityRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/events': typeof EventsRoute
-  '/scanner': typeof ScannerRoute
-  '/login/': typeof LoginIndexRoute
+  "/": typeof IndexRoute
+  "/events": typeof EventsRoute
+  "/hospitality": typeof HospitalityRouteWithChildren
+  "/scanner": typeof ScannerRoute
+  "/hospitality/gate-checkin": typeof HospitalityGateCheckinRoute
+  "/hospitality/gate-checkout": typeof HospitalityGateCheckoutRoute
+  "/hospitality/map-qr": typeof HospitalityMapQrRoute
+  "/hospitality/": typeof HospitalityIndexRoute
+  "/login/": typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/events': typeof EventsRoute
-  '/scanner': typeof ScannerRoute
-  '/login': typeof LoginIndexRoute
+  "/": typeof IndexRoute
+  "/events": typeof EventsRoute
+  "/scanner": typeof ScannerRoute
+  "/hospitality/gate-checkin": typeof HospitalityGateCheckinRoute
+  "/hospitality/gate-checkout": typeof HospitalityGateCheckoutRoute
+  "/hospitality/map-qr": typeof HospitalityMapQrRoute
+  "/hospitality": typeof HospitalityIndexRoute
+  "/login": typeof LoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/events': typeof EventsRoute
-  '/scanner': typeof ScannerRoute
-  '/login/': typeof LoginIndexRoute
+  "/": typeof IndexRoute
+  "/events": typeof EventsRoute
+  "/hospitality": typeof HospitalityRouteWithChildren
+  "/scanner": typeof ScannerRoute
+  "/hospitality/gate-checkin": typeof HospitalityGateCheckinRoute
+  "/hospitality/gate-checkout": typeof HospitalityGateCheckoutRoute
+  "/hospitality/map-qr": typeof HospitalityMapQrRoute
+  "/hospitality/": typeof HospitalityIndexRoute
+  "/login/": typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/events' | '/scanner' | '/login/'
+  fullPaths:
+    | "/"
+    | "/events"
+    | "/hospitality"
+    | "/scanner"
+    | "/hospitality/gate-checkin"
+    | "/hospitality/gate-checkout"
+    | "/hospitality/map-qr"
+    | "/hospitality/"
+    | "/login/"
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/events' | '/scanner' | '/login'
-  id: '__root__' | '/' | '/events' | '/scanner' | '/login/'
+  to:
+    | "/"
+    | "/events"
+    | "/scanner"
+    | "/hospitality/gate-checkin"
+    | "/hospitality/gate-checkout"
+    | "/hospitality/map-qr"
+    | "/hospitality"
+    | "/login"
+  id:
+    | "__root__"
+    | "/"
+    | "/events"
+    | "/hospitality"
+    | "/scanner"
+    | "/hospitality/gate-checkin"
+    | "/hospitality/gate-checkout"
+    | "/hospitality/map-qr"
+    | "/hospitality/"
+    | "/login/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventsRoute: typeof EventsRoute
+  HospitalityRoute: typeof HospitalityRouteWithChildren
   ScannerRoute: typeof ScannerRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/scanner': {
-      id: '/scanner'
-      path: '/scanner'
-      fullPath: '/scanner'
+    "/scanner": {
+      id: "/scanner"
+      path: "/scanner"
+      fullPath: "/scanner"
       preLoaderRoute: typeof ScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
+    "/hospitality": {
+      id: "/hospitality"
+      path: "/hospitality"
+      fullPath: "/hospitality"
+      preLoaderRoute: typeof HospitalityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/events": {
+      id: "/events"
+      path: "/events"
+      fullPath: "/events"
       preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
+    "/": {
+      id: "/"
+      path: "/"
+      fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login/'
+    "/login/": {
+      id: "/login/"
+      path: "/login"
+      fullPath: "/login/"
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    "/hospitality/": {
+      id: "/hospitality/"
+      path: "/"
+      fullPath: "/hospitality/"
+      preLoaderRoute: typeof HospitalityIndexRouteImport
+      parentRoute: typeof HospitalityRoute
+    }
+    "/hospitality/map-qr": {
+      id: "/hospitality/map-qr"
+      path: "/map-qr"
+      fullPath: "/hospitality/map-qr"
+      preLoaderRoute: typeof HospitalityMapQrRouteImport
+      parentRoute: typeof HospitalityRoute
+    }
+    "/hospitality/gate-checkout": {
+      id: "/hospitality/gate-checkout"
+      path: "/gate-checkout"
+      fullPath: "/hospitality/gate-checkout"
+      preLoaderRoute: typeof HospitalityGateCheckoutRouteImport
+      parentRoute: typeof HospitalityRoute
+    }
+    "/hospitality/gate-checkin": {
+      id: "/hospitality/gate-checkin"
+      path: "/gate-checkin"
+      fullPath: "/hospitality/gate-checkin"
+      preLoaderRoute: typeof HospitalityGateCheckinRouteImport
+      parentRoute: typeof HospitalityRoute
     }
   }
 }
 
+interface HospitalityRouteChildren {
+  HospitalityGateCheckinRoute: typeof HospitalityGateCheckinRoute
+  HospitalityGateCheckoutRoute: typeof HospitalityGateCheckoutRoute
+  HospitalityMapQrRoute: typeof HospitalityMapQrRoute
+  HospitalityIndexRoute: typeof HospitalityIndexRoute
+}
+
+const HospitalityRouteChildren: HospitalityRouteChildren = {
+  HospitalityGateCheckinRoute: HospitalityGateCheckinRoute,
+  HospitalityGateCheckoutRoute: HospitalityGateCheckoutRoute,
+  HospitalityMapQrRoute: HospitalityMapQrRoute,
+  HospitalityIndexRoute: HospitalityIndexRoute,
+}
+
+const HospitalityRouteWithChildren = HospitalityRoute._addFileChildren(
+  HospitalityRouteChildren
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventsRoute: EventsRoute,
+  HospitalityRoute: HospitalityRouteWithChildren,
   ScannerRoute: ScannerRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
