@@ -20,8 +20,8 @@ import { Route as HospitalityGateCheckoutRouteImport } from './routes/hospitalit
 import { Route as HospitalityGateCheckinRouteImport } from './routes/hospitality/gate-checkin'
 
 const ScannerRoute = ScannerRouteImport.update({
-  id: '/scanner',
-  path: '/scanner',
+  id: "/scanner",
+  path: "/scanner",
   getParentRoute: () => rootRouteImport,
 } as any)
 const HospitalityRoute = HospitalityRouteImport.update({
@@ -30,18 +30,18 @@ const HospitalityRoute = HospitalityRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+  id: "/events",
+  path: "/events",
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
+  id: "/login/",
+  path: "/login/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const HospitalityIndexRoute = HospitalityIndexRouteImport.update({
@@ -141,12 +141,12 @@ export interface RootRouteChildren {
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/scanner': {
-      id: '/scanner'
-      path: '/scanner'
-      fullPath: '/scanner'
+    "/scanner": {
+      id: "/scanner"
+      path: "/scanner"
+      fullPath: "/scanner"
       preLoaderRoute: typeof ScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -164,17 +164,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
+    "/": {
+      id: "/"
+      path: "/"
+      fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login/'
+    "/login/": {
+      id: "/login/"
+      path: "/login"
+      fullPath: "/login/"
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

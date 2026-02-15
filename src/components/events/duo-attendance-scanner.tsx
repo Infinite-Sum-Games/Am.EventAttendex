@@ -11,14 +11,12 @@ import {
   LogOut,
 } from "lucide-react"
 import { toast } from "sonner"
-import { useMutation } from "@tanstack/react-query"
-import api from "@/lib/axios"
-import { apiEndpoints } from "@/lib/api-endpoints"
 import { cn } from "@/lib/utils"
 import {
   markAttendanceSchema,
   type MarkAttendancePayload,
 } from "@/schemas/attendance"
+import { useMarkAttendance } from "@/hooks/use-attendance"
 
 type ScanStatus = "idle" | "success" | "error"
 type ScanMode = "IN" | "OUT"
@@ -43,49 +41,32 @@ export function DuoAttendanceScanner({
     "environment"
   )
 
-  const { mutate: markAttendance } = useMutation({
-    mutationFn: (payload: MarkAttendancePayload) => {
-      let url = ""
-      if (isTeamEvent) {
-        url =
-          scanMode === "IN"
-            ? apiEndpoints.CHECKIN_TEAM_ATTENDANCE(
-                payload.studentId,
-                payload.scheduleId
-              )
-            : apiEndpoints.CHECKOUT_TEAM_ATTENDANCE(
-                payload.studentId,
-                payload.scheduleId
-              )
-      } else {
-        url =
-          scanMode === "IN"
-            ? apiEndpoints.CHECKIN_INDIVIDUAL_ATTENDANCE(
-                payload.studentId,
-                payload.scheduleId
-              )
-            : apiEndpoints.CHECKOUT_INDIVIDUAL_ATTENDANCE(
-                payload.studentId,
-                payload.scheduleId
-              )
+  const { mutate: markAttendance } = useMarkAttendance()
+
+  const handleMark = (payload: MarkAttendancePayload) => {
+    markAttendance(
+      {
+        studentId: payload.studentId,
+        scheduleId: payload.scheduleId,
+        type: scanMode === "IN" ? "CHECKIN" : "CHECKOUT",
+        isTeam: isTeamEvent,
+        markingType: "DUO",
+      },
+      {
+        onSuccess: () => {
+          setStatus("success")
+          resetStatusAfterDelay()
+        },
+        onError: (error: any) => {
+          setStatus("error")
+          const errorMessage =
+            error.response?.data?.message || "Failed to mark attendance"
+          toast.error(errorMessage)
+          resetStatusAfterDelay()
+        },
       }
-      return api.post(url)
-    },
-    onSuccess: () => {
-      setStatus("success")
-      toast.success(
-        `${scanMode === "IN" ? "Check-in" : "Check-out"} marked successfully`
-      )
-      resetStatusAfterDelay()
-    },
-    onError: (error: any) => {
-      setStatus("error")
-      const errorMessage =
-        error.response?.data?.message || "Failed to mark attendance"
-      toast.error(errorMessage)
-      resetStatusAfterDelay()
-    },
-  })
+    )
+  }
 
   const resetStatusAfterDelay = useCallback(() => {
     setTimeout(() => {
@@ -123,7 +104,7 @@ export function DuoAttendanceScanner({
         return
       }
 
-      markAttendance(validation.data)
+      handleMark(validation.data)
     },
     [status, scheduleId, markAttendance, resetStatusAfterDelay]
   )

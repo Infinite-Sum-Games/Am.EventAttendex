@@ -1,0 +1,124 @@
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { ArrowLeft, CalendarDays, Building2, Loader2 } from "lucide-react"
+import { ScheduleCard } from "@/components/events/schedule-card"
+import { MOCK_SCHEDULES } from "@/components/events/mock-data"
+import { useOrganizerEvents } from "@/hooks/use-events"
+import { useEventStore } from "@/store/event-store"
+import { useEffect, useMemo } from "react"
+
+export const Route = createFileRoute("/events/$eventId/")({
+  component: EventDetailPage,
+})
+
+function EventDetailPage() {
+  const { eventId } = Route.useParams()
+  const { setSelectedEvent } = useEventStore()
+
+  // API Fetch
+  const { data: events, isLoading, isError } = useOrganizerEvents()
+
+  const event = useMemo(() => {
+    return events?.find((e) => e.id === eventId)
+  }, [events, eventId])
+
+  // Mock schedules for now as endpoint is ambiguous
+  const schedules = MOCK_SCHEDULES[eventId] ?? []
+
+  // Update store on load
+  useEffect(() => {
+    if (event) {
+      setSelectedEvent(event)
+    }
+  }, [event, setSelectedEvent])
+
+  if (isLoading) {
+    return (
+      <div
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{ backgroundColor: "var(--navy-dark)" }}
+      >
+        <Loader2 className="h-10 w-10 text-amber-400 animate-spin" />
+      </div>
+    )
+  }
+
+  if (isError || (!isLoading && !event)) {
+    return (
+      <div
+        className="min-h-screen w-full flex flex-col items-center justify-center gap-4"
+        style={{ backgroundColor: "var(--navy-dark)" }}
+      >
+        <p className="text-white/60 text-lg">
+          {isError ? "Failed to load event" : "Event not found"}
+        </p>
+        <Link
+          to="/events"
+          className="text-amber-400 hover:text-amber-300 transition-colors text-sm font-medium"
+        >
+          ← Back to Events
+        </Link>
+      </div>
+    )
+  }
+
+  // Safe to assert event is defined here due to check above
+  const safeEvent = event!
+
+  return (
+    <div
+      className="min-h-screen w-full"
+      style={{ backgroundColor: "var(--navy-dark)" }}
+    >
+      <div className="container mx-auto p-4 md:p-6 pb-20 max-w-7xl">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <Link
+            to="/events"
+            className="p-2 -ml-2 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-all active:scale-95"
+          >
+            <ArrowLeft size={22} />
+          </Link>
+        </div>
+
+        {/* Event Info */}
+        <div className="mb-8 space-y-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-white/90 leading-tight">
+            {safeEvent.name}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5 text-sm text-white/50">
+              <Building2 size={14} className="text-amber-400/60" />
+              <span>{safeEvent.organizer}</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold bg-amber-500/10 text-amber-300/80 border border-amber-400/10">
+              <CalendarDays size={12} />
+              {safeEvent.day}
+            </div>
+          </div>
+        </div>
+
+        {/* Schedules Grid */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-white/70">Schedules</h2>
+
+          {schedules.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {schedules.map((schedule) => (
+                <ScheduleCard
+                  key={schedule.id}
+                  schedule={schedule}
+                  eventId={eventId}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 rounded-xl border border-white/5 bg-white/5">
+              <p className="text-white/40">No schedules found.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
