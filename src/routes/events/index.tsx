@@ -6,6 +6,8 @@ import { EventsFilter } from "@/components/events/events-filter"
 import { useOrganizerEvents } from "@/hooks/use-events"
 import { Button } from "@/components/ui/button"
 import type { DayFilter } from "@/types/events"
+import axiosClient from "@/lib/axios"
+import { apiEndpoints } from "@/lib/api-endpoints"
 
 export const Route = createFileRoute("/events/")({
   component: EventsPage,
@@ -46,9 +48,12 @@ function EventsPage() {
     })
   }, [searchQuery, selectedDay, events])
 
-  const handleLogout = () => {
-    // TODO: Implement actual logout logic
-    navigate({ to: "/login" })
+  const handleLogout = async () => {
+    try {
+      await axiosClient.get(apiEndpoints.ORGANIZER_LOGOUT)
+    } finally {
+      navigate({ to: "/login" })
+    }
   }
 
   if (isLoading) {

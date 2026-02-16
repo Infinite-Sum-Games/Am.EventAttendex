@@ -68,10 +68,10 @@ export function EventCard({
           </div>
         </CardHeader>
         <CardContent className="pt-2">
-          <div className="flex items-center gap-1.5 text-sm text-white/50">
+          {/* <div className="flex items-center gap-1.5 text-sm text-white/50">
             <Building2 size={14} className="text-amber-400/60" />
             <span>{event.organizer || "Organizer TBD"}</span>
-          </div>
+          </div> */}
           <div className="flex items-center gap-2 mt-2">
             {" "}
             {/* Added mt-2 for spacing */}
