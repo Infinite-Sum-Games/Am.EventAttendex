@@ -7,7 +7,7 @@ export const apiEndpoints = {
   GET_ORGANIZER_EVENTS: "/attendance/list/event",
 
   // schedules page
-  GET_EVENT_SCHEDULES: (eventId: string, scheduleId: string) =>
+  GET_EVENT_PARTICIPANTS: (eventId: string, scheduleId: string) =>
     `/attendance/list/${eventId}/${scheduleId}`,
 
   // ATTENDANCE SCANNER ENDPOINTS

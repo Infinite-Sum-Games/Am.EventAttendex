@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarDays, Clock, MapPin } from "lucide-react"
+import { CalendarDays, MapPin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Schedule } from "@/types/events"
 
@@ -8,6 +8,14 @@ interface ScheduleCardProps {
   schedule: Schedule
   eventId: string
   className?: string
+}
+
+function formatTime(dateStr: string) {
+  return new Date(dateStr).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })
 }
 
 export function ScheduleCard({
@@ -33,7 +41,8 @@ export function ScheduleCard({
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start gap-4">
             <CardTitle className="text-lg font-semibold text-white/90 group-hover:text-amber-400 transition-colors">
-              {schedule.title}
+              {formatTime(schedule.start_time)} -{" "}
+              {formatTime(schedule.end_time)}
             </CardTitle>
             {/* Badges removed as per user request */}
           </div>
@@ -46,15 +55,8 @@ export function ScheduleCard({
           </div>
 
           <div className="flex items-center gap-2">
-            <Clock size={16} className="text-amber-400/70" />
-            <span>
-              {schedule.startTime} - {schedule.endTime}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
             <CalendarDays size={16} className="text-amber-400/70" />
-            <span>{schedule.date}</span>
+            <span>{schedule.event_date}</span>
           </div>
         </CardContent>
       </Card>

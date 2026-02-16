@@ -8,12 +8,22 @@ export function EventCard({
   className,
   isActive = false,
 }: EventCardProps) {
-  const isGroup = event.type === "GROUP"
+  const isGroup = event.is_group
+
+  // Derive date from first schedule or fallback
+  const eventDate = event.schedules?.[0]?.event_date
+
+  const formattedDate = eventDate
+    ? new Date(eventDate).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+      })
+    : "TBD"
 
   return (
     <Link
       to="/events/$eventId"
-      params={{ eventId: event.id }}
+      params={{ eventId: event.event_id }}
       className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 rounded-2xl group"
     >
       <Card
@@ -40,7 +50,7 @@ export function EventCard({
         <CardHeader className="pb-1">
           <div className="flex justify-between items-start gap-2">
             <CardTitle className="text-xl font-bold text-white/90 group-hover:text-white transition-colors">
-              {event.name}
+              {event.event_name}
             </CardTitle>
 
             {/* Type Badges - DISTINCT COLORS */}
@@ -57,14 +67,20 @@ export function EventCard({
           </div>
         </CardHeader>
         <CardContent className="pt-2">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-1.5 text-sm text-white/50">
+            <Building2 size={14} className="text-amber-400/60" />
+            <span>{event.organizer || "Organizer TBD"}</span>
+          </div> */}
+          <div className="flex items-center gap-2 mt-2">
+            {" "}
+            {/* Added mt-2 for spacing */}
             <div
               className={cn(
                 "inline-block rounded-lg px-3 py-1 text-sm font-semibold",
                 "bg-amber-500/10 text-amber-300/80 border border-amber-400/10"
               )}
             >
-              {event.day}
+              {formattedDate}
             </div>
           </div>
         </CardContent>

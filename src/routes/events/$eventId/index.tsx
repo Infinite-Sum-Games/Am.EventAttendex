@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { ArrowLeft, CalendarDays, Building2, Loader2 } from "lucide-react"
+import { ArrowLeft, CalendarDays, Loader2 } from "lucide-react"
 import { ScheduleCard } from "@/components/events/schedule-card"
-import { MOCK_SCHEDULES } from "@/components/events/mock-data"
 import { useOrganizerEvents } from "@/hooks/use-events"
 import { useEventStore } from "@/store/event-store"
 import { useEffect, useMemo } from "react"
@@ -18,11 +17,11 @@ function EventDetailPage() {
   const { data: events, isLoading, isError } = useOrganizerEvents()
 
   const event = useMemo(() => {
-    return events?.find((e) => e.id === eventId)
+    return events?.find((e) => e.event_id === eventId)
   }, [events, eventId])
 
   // Mock schedules for now as endpoint is ambiguous
-  const schedules = MOCK_SCHEDULES[eventId] ?? []
+  const schedules = event?.schedules ?? []
 
   // Update store on load
   useEffect(() => {
@@ -64,6 +63,15 @@ function EventDetailPage() {
   // Safe to assert event is defined here due to check above
   const safeEvent = event!
 
+  // Derive date
+  const eventDate = safeEvent.schedules?.[0]?.event_date
+  const formattedDate = eventDate
+    ? new Date(eventDate).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+      })
+    : "TBD"
+
   return (
     <div
       className="min-h-screen w-full"
@@ -83,17 +91,13 @@ function EventDetailPage() {
         {/* Event Info */}
         <div className="mb-8 space-y-3">
           <h1 className="text-2xl md:text-3xl font-bold text-white/90 leading-tight">
-            {safeEvent.name}
+            {safeEvent.event_name}
           </h1>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-1.5 text-sm text-white/50">
-              <Building2 size={14} className="text-amber-400/60" />
-              <span>{safeEvent.organizer}</span>
-            </div>
             <div className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold bg-amber-500/10 text-amber-300/80 border border-amber-400/10">
               <CalendarDays size={12} />
-              {safeEvent.day}
+              {formattedDate}
             </div>
           </div>
         </div>

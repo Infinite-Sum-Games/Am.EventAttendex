@@ -6,6 +6,8 @@ import { EventsFilter } from "@/components/events/events-filter"
 import { useOrganizerEvents } from "@/hooks/use-events"
 import { Button } from "@/components/ui/button"
 import type { DayFilter } from "@/types/events"
+import axiosClient from "@/lib/axios"
+import { apiEndpoints } from "@/lib/api-endpoints"
 
 export const Route = createFileRoute("/events/")({
   component: EventsPage,
@@ -21,18 +23,37 @@ function EventsPage() {
   const filteredEvents = useMemo(() => {
     if (!events) return []
     return events.filter((event) => {
+      const name = event.event_name || ""
+      const organizer = event.organizer || ""
       const matchesSearch =
-        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.organizer.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesDay = selectedDay === "All" || event.day === selectedDay
+        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        organizer.toLowerCase().includes(searchQuery.toLowerCase())
+
+      // Check if any schedule matches the selected day
+      // Basic match for now: check if schedule date string contains selectedDay (e.g. "20 Feb")
+      // OR parse date properly. Assuming simpler string match or derived logic for now.
+      const hasMatchingDay = event.schedules?.some((s) => {
+        if (!s.event_date) return false
+        // Simple check: format date and check equality
+        const d = new Date(s.event_date).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+        })
+        return d === selectedDay
+      })
+
+      const matchesDay = selectedDay === "All" || hasMatchingDay
 
       return matchesSearch && matchesDay
     })
   }, [searchQuery, selectedDay, events])
 
-  const handleLogout = () => {
-    // TODO: Implement actual logout logic
-    navigate({ to: "/login" })
+  const handleLogout = async () => {
+    try {
+      await axiosClient.get(apiEndpoints.ORGANIZER_LOGOUT)
+    } finally {
+      navigate({ to: "/login" })
+    }
   }
 
   if (isLoading) {
@@ -101,7 +122,7 @@ function EventsPage() {
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredEvents.length > 0 ? (
             filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard key={event.event_id} event={event} />
             ))
           ) : (
             <div className="text-center py-10 col-span-full">
