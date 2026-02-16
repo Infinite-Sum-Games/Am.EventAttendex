@@ -1,2 +1,0 @@
-src/components/events/attendance-actions.tsx(32,26): error TS2339: Property 'markingType' does not exist on type 'Schedule'.
-src/hooks/use-attendance.ts(16,22): error TS2339: Property 'GET_EVENT_SCHEDULES' does not exist on type '{ readonly ORGANIZER_LOGIN: "/auth/organizer/login"; readonly ORGANIZER_LOGOUT: "/auth/organizer/logout"; readonly ORGANIZER_SESSION: "/auth/organizer/session"; readonly GET_ORGANIZER_EVENTS: "/attendance/list/event"; ... 21 more ...; readonly GATE_CHECKOUT: (hospId: string) => string; }'.
