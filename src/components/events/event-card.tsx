@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router"
-import { Building2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import type { EventCardProps } from "@/types/events"
