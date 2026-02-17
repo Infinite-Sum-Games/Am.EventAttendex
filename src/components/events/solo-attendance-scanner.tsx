@@ -262,7 +262,7 @@ export function SoloAttendanceScanner({
                 </h3>
                 <p className="text-white/50 text-[11px] leading-tight mt-0.5">
                   {isTeamEvent ? (
-                    "Only one member of the team needs to mark attendance for the whole team."
+                    "All team members need to mark attendance separately."
                   ) : (
                     <>
                       Attendance is marked only{" "}
