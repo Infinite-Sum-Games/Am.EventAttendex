@@ -352,7 +352,7 @@ export function DuoAttendanceScanner({
                 </h3>
                 <p className="text-white/50 text-[11px] leading-tight mt-0.5">
                   {isTeamEvent
-                    ? "Scan any team member's QR code to mark attendance for the entire team."
+                    ? "Each team member needs to scan their own QR code to mark attendance."
                     : `Currently marking ${
                         scanMode === "IN" ? "Entry" : "Exit"
                       } time. Switch tab to change.`}
